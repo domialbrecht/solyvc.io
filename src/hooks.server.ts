@@ -5,7 +5,7 @@ import { sequence } from '@sveltejs/kit/hooks';
 const authorizationHandle: Handle = async ({ event, resolve }) => {
 	if (!event.url.pathname.startsWith('/auth')) {
 		const session = await event.locals.auth();
-		if (!session) {
+		if (!session || session.error === 'RefreshAccessTokenError') {
 			throw redirect(303, '/auth/signin');
 		}
 	}

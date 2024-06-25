@@ -1,6 +1,9 @@
-<script>
+<script lang="ts">
 	import welcome from '$lib/images/svelte-welcome.webp';
 	import welcome_fallback from '$lib/images/svelte-welcome.png';
+	import type { PageData } from './$types';
+
+	export let data: PageData;
 </script>
 
 <svelte:head>
@@ -10,6 +13,7 @@
 
 <section>
 	<h1>
+		<pre>{JSON.stringify(data, null, 2)}</pre>
 		<span class="welcome">
 			<picture>
 				<source srcset={welcome} type="image/webp" />
