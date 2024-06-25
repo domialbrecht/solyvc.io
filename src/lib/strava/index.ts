@@ -4,6 +4,9 @@ import { accounts, users } from '$lib/server/db/schema';
 import { error } from '@sveltejs/kit';
 import type { Session } from '@auth/sveltekit';
 
+const CLUB = 'solyvc';
+const BALMBERGSEGMENT = 12482665;
+
 const getAtheleteFromSession = async (session: Session) => {
 	const athletes = await db
 		.select()
@@ -27,19 +30,26 @@ const getAtheleteFromSession = async (session: Session) => {
 	return { token: athletes[0].account.access_token, id };
 };
 
-const stravaFetch = async (accessToken: string, path: string) => {
-	console.log('accessToken', accessToken);
-	console.log('path', path);
+const stravaFetch = async (session: Session, path: string) => {
+	const { token } = await getAtheleteFromSession(session);
 	return await fetch(`https://www.strava.com/api/v3/${path}`, {
 		headers: {
-			Authorization: `Bearer ${accessToken}`
+			Authorization: `Bearer ${token}`
 		}
 	}).then((res) => res.json());
 };
 
 const getAthleteStats = async (session: Session) => {
-	const { token, id } = await getAtheleteFromSession(session);
-	return await stravaFetch(token, `athletes/${id}/stats`);
+	const { id } = await getAtheleteFromSession(session);
+	return await stravaFetch(session, `athletes/${id}/stats`);
 };
 
-export { getAthleteStats };
+const getClubActivities = async (session: Session) => {
+	return await stravaFetch(session, `clubs/${CLUB}/activities`);
+};
+
+const getClubMembers = async (session: Session) => {
+	return await stravaFetch(session, `clubs/${CLUB}/members`);
+};
+
+export { getAthleteStats, getClubActivities, getClubMembers };
